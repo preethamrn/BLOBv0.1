@@ -1,8 +1,6 @@
 /**
 * NAME: PREETHAM REDDY N.
 * PROJECT TITLE: BLOBv0.1
-* CLASS: 12 A
-* ROLL NO: 18
 **/
 
 #include "SDL/SDL.h"
