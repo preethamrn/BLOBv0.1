@@ -1,0 +1,6 @@
+2 50 25 50 25
+w s a d z q e 
+i k j l m u o 
+t g f h v r y 
+w s a d 1 2 3 
+
