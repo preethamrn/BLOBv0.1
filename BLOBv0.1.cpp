@@ -3,10 +3,10 @@
 * PROJECT TITLE: BLOBv0.1
 **/
 
-#include "SDL/SDL.h"
-#include "SDL/SDL_ttf.h"
-#include "SDL_image.h"
-#include "SDL_mixer.h"
+#include <SDL.h>
+#include <SDL_ttf.h>
+#include <SDL_image.h>
+#include <SDL_mixer.h>
 #include <fstream>  //FOR INPUTTING AND CHANGING SETTINGS
 #include <string>   //STRINGS FOR DOING FILE IO FOR LOADING IMAGE
 #include <sstream>  //CONVERTION OF INT TO STRING IN POINTSDISPLAY FUNCTION
