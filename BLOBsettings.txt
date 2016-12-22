@@ -1,5 +1,6 @@
-2 50 25 250 25
+4 50 25 100 5
 w s a d z q e 
 i k j l m u o 
 t g f h v r y 
     , / . 
+

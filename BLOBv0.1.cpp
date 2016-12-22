@@ -16,7 +16,7 @@
 using namespace std;
 
 //ALL CONTANTS AND GLOBAL VARIABLES
-const int SCREEN_WIDTH = 1336;
+const int SCREEN_WIDTH = 1366;
 const int SCREEN_HEIGHT = 768;
 const int SCREEN_BPP = 32;
 const int FRAMES_PER_SECOND = 30;
@@ -124,7 +124,7 @@ enum { WHITE = 0, RED = 1, BLUE = 2, GREEN = 3, YELLOW = 4, ZOMBIE = 5};
 //BOARDS THAT STORE DATA ABOUT GAME STATE
 char BOARD[MAX_BOARD_WIDTH][MAX_BOARD_HEIGHT];
 int COLOR_MATRIX[MAX_BOARD_WIDTH][MAX_BOARD_HEIGHT];
-int HASHMAP[2][MAX_BOARD_WIDTH][MAX_BOARD_HEIGHT];
+int HASHGRID[2][MAX_BOARD_WIDTH][MAX_BOARD_HEIGHT];
 int PICKUP_X, PICKUP_Y;
 
 int WIN_AMOUNT, PLAYERS, BOARD_WIDTH, BOARD_HEIGHT, ZOMBIE_AMOUNT;
@@ -154,10 +154,10 @@ BOMB::BOMB(int mBOMB_timer, int mplayerNo, int mBOMB_type, int mX, int mY) {
 //REMOVES BOMB FROM ARRAY
 void BOMB::destroy() {
 	for(int i=0; i<BOARD_WIDTH; i++) {
-		HASHMAP[BOMB_type][i][Y] = WHITE;
+		HASHGRID[BOMB_type][i][Y] = WHITE;
 	}
 	for(int i=0; i<BOARD_HEIGHT; i++) {
-		HASHMAP[BOMB_type][X][i] = WHITE;
+		HASHGRID[BOMB_type][X][i] = WHITE;
 	}
 }
 //COUNTER TO CHECK WHETHER BOMB SHOULD BE DESTROYED OR NOT
@@ -172,10 +172,10 @@ void BOMB::counter() {
 //PUTS BOMB ONTO ARRAY
 void BOMB::explode() {
 	for(int i=0; i<BOARD_WIDTH; i++) {
-		HASHMAP[BOMB_type][i][Y] = playerNo;
+		HASHGRID[BOMB_type][i][Y] = playerNo;
 	}
 	for(int i=0; i<BOARD_HEIGHT; i++) {
-		HASHMAP[BOMB_type][X][i] = playerNo;
+		HASHGRID[BOMB_type][X][i] = playerNo;
 	}
 }
 //BASE CLASS FOR ANY OBJECT THAT CAN MOVE ON SCREEN (ie: ZOMBIES AND PLAYERS)
@@ -265,25 +265,25 @@ GUN::GUN(int minit_X, int minit_Y, int mplayerNo) {
 char GUN::autopilot() {
     char OutputValue=0;
     //IF THE CURRENT LOCATION ISN'T SAFE (NOT WHITE OR SAME COLOR AS GUN)
-    if(HASHMAP[0][X_POS][Y_POS]!=WHITE && HASHMAP[0][X_POS][Y_POS]!=playerNo) {
+    if(HASHGRID[0][X_POS][Y_POS]!=WHITE && HASHGRID[0][X_POS][Y_POS]!=playerNo) {
         //FIND WHETHER TO MOVE UP, DOWN, LEFT OR RIGHT TO AVOID FURTHER DAMAGE
         if(X_POS < BOARD_WIDTH-1) {
-            if(HASHMAP[0][X_POS+1][Y_POS]!=WHITE && HASHMAP[0][X_POS+1][Y_POS]!=playerNo) {
+            if(HASHGRID[0][X_POS+1][Y_POS]!=WHITE && HASHGRID[0][X_POS+1][Y_POS]!=playerNo) {
                 if(Y_POS > BOARD_HEIGHT/2) OutputValue = CONTROLS[0];
                 else OutputValue = CONTROLS[1];
             }
         } else if(X_POS == BOARD_WIDTH-1) {
-            if(HASHMAP[0][X_POS-1][Y_POS]!=WHITE && HASHMAP[0][X_POS-1][Y_POS]!=playerNo) {
+            if(HASHGRID[0][X_POS-1][Y_POS]!=WHITE && HASHGRID[0][X_POS-1][Y_POS]!=playerNo) {
                 if(Y_POS > BOARD_HEIGHT/2)OutputValue = CONTROLS[0];
                 else OutputValue = CONTROLS[1];
             }
         } else if(Y_POS < BOARD_HEIGHT-1) {
-            if(HASHMAP[0][X_POS][Y_POS+1]!=WHITE && HASHMAP[0][X_POS][Y_POS+1]!=playerNo) {
+            if(HASHGRID[0][X_POS][Y_POS+1]!=WHITE && HASHGRID[0][X_POS][Y_POS+1]!=playerNo) {
                 if(X_POS > BOARD_WIDTH/2) OutputValue = CONTROLS[2];
                 else OutputValue = CONTROLS[3];
             }
         } else if(Y_POS == BOARD_HEIGHT-1) {
-            if(HASHMAP[0][X_POS][Y_POS-1]!=WHITE && HASHMAP[0][X_POS][Y_POS-1]!=playerNo) {
+            if(HASHGRID[0][X_POS][Y_POS-1]!=WHITE && HASHGRID[0][X_POS][Y_POS-1]!=playerNo) {
                 if(X_POS > BOARD_WIDTH/2) OutputValue = CONTROLS[2];
                 else OutputValue = CONTROLS[3];
             }
@@ -370,7 +370,7 @@ int GUN::input(char InputValue) {
 			bomb[BOMB_no].Y=Y_POS;
 			bomb[BOMB_no].BOMB_timer=0;
 			bomb[BOMB_no].playerNo=playerNo;
-			HASHMAP[0][bomb[BOMB_no].X][bomb[BOMB_no].Y]=playerNo;
+			HASHGRID[0][bomb[BOMB_no].X][bomb[BOMB_no].Y]=playerNo;
 			if(music)
                 Mix_PlayChannel(-1, trapChunk, 0);
 		}
@@ -470,8 +470,8 @@ void GAME::initialize() {
 		for(int j=0; j<BOARD_WIDTH; j++) {
 			BOARD[j][i]=' ';
 			COLOR_MATRIX[j][i]=WHITE;
-			HASHMAP[0][j][i]=WHITE;
-			HASHMAP[1][j][i]=WHITE;
+			HASHGRID[0][j][i]=WHITE;
+			HASHGRID[1][j][i]=WHITE;
 		}
 	}
 	PICKUP_X=BOARD_WIDTH/2;
@@ -540,8 +540,8 @@ void GAME::display_screen() {
 	for(int i=0; i<BOARD_HEIGHT; i++) {
 		for(int j=0; j<BOARD_WIDTH; j++) {
             //SHOW THE CAMOFLAGE
-            if(HASHMAP[1][j][i]!=WHITE) {
-                camo.y = PIXELS_PER_TILE*(HASHMAP[1][j][i]);
+            if(HASHGRID[1][j][i]!=WHITE) {
+                camo.y = PIXELS_PER_TILE*(HASHGRID[1][j][i]);
                 apply_surface(PIXELS_PER_TILE*(j+1),PIXELS_PER_TILE*(i+1),pallette,screen,&camo);
 			}
 			//SHOW THE PLAYER
@@ -556,8 +556,8 @@ void GAME::display_screen() {
                 }
             }
             //SHOW THE BOMBS AND TRAPS
-            else if(HASHMAP[0][j][i]!=WHITE) {
-                block.y = PIXELS_PER_TILE*(HASHMAP[0][j][i]);
+            else if(HASHGRID[0][j][i]!=WHITE) {
+                block.y = PIXELS_PER_TILE*(HASHGRID[0][j][i]);
                 apply_surface(PIXELS_PER_TILE*(j+1),PIXELS_PER_TILE*(i+1),pallette,screen,&block);
 			} else {
                 player.y = 0;
@@ -643,7 +643,7 @@ int GAME::pointsDisplay() {
 int GAME::collision_check() {
 	for(int i=0; i<PLAYERS; i++)
 		for(int j=0; j<PLAYERS; j++)
-            if(HASHMAP[0][Player[i].X_POS][Player[i].Y_POS]==Player[j].playerNo && i!=j) {
+            if(HASHGRID[0][Player[i].X_POS][Player[i].Y_POS]==Player[j].playerNo && i!=j) {
                 Player[j].POINTS++;
                 if(music)
                     Mix_PlayChannel(-1, pointChunk, 0);
@@ -664,11 +664,11 @@ int GAME::zombie_collision_check() {
     for(int i=0; i<ZOMBIE_AMOUNT; i++) {
         if(Player[0].X_POS == Zombie[i].X_POS && Player[0].Y_POS == Zombie[i].Y_POS) {
             return Zombie[i].playerNo - 1;
-        } else if(HASHMAP[0][Zombie[i].X_POS][Zombie[i].Y_POS] != WHITE) {
+        } else if(HASHGRID[0][Zombie[i].X_POS][Zombie[i].Y_POS] != WHITE) {
             Player[0].POINTS++;
             if(music)
                 Mix_PlayChannel(-1, pointChunk, 0);
-            HASHMAP[0][Zombie[i].X_POS][Zombie[i].Y_POS] = WHITE;
+            HASHGRID[0][Zombie[i].X_POS][Zombie[i].Y_POS] = WHITE;
             Zombie[i].respawn();
             makeNewZombie = true;
         }
@@ -695,28 +695,36 @@ int GAME::zombie_collision_check() {
 //CHECKS FOR COLLISIONS WITH ANY OF THE POSSIBLE OBJECTS ON BOARD IN CAPTURE THE FLAG MODE
 int GAME::capture_collision_check() {
     //CHECKS FOR COLLISION WITH FLAGS OR ANY OF THE BOMBS
-	for(int i=0; i<PLAYERS; i++) {
-		for(int j=(i+1)%2; j<PLAYERS; j+=2) {
-			if(HASHMAP[0][Player[i].X_POS][Player[i].Y_POS]==Player[j].playerNo && i!=j) {
+	for(int i=0; i<PLAYERS; i++) { //player
+		for(int j=(i+1)%2; j<PLAYERS; j+=2) { //enemy
+			if(HASHGRID[0][Player[i].X_POS][Player[i].Y_POS]==Player[j].playerNo && i!=j) {
 				Player[j].POINTS++;
                 if(music)
                     Mix_PlayChannel(-1, pointChunk, 0);
-				if(Player[j].FLAG_picked == i+1) {
-					Player[j].FLAG_picked=0;
-					Player[j].FLAG_X=Player[i].X_POS; Player[j].FLAG_Y=Player[i].Y_POS;
-					Player[i].X_POS=Player[i].init_X; Player[i].Y_POS=Player[i].init_Y;
-				} else if(Player[(j+2)%4].FLAG_picked == i+1) {
-					Player[(j+2)%4].FLAG_picked=0;
-					Player[(j+2)%4].FLAG_X=Player[i].X_POS; Player[(j+2)%4].FLAG_Y=Player[i].Y_POS;
-					Player[i].X_POS=Player[i].init_X; Player[i].Y_POS=Player[i].init_Y;
-				}
-			}
-			if(Player[i].FLAG_X==Player[j].X_POS && Player[i].FLAG_Y==Player[j].Y_POS && i!=j) {
-				Player[i].FLAG_picked=j+1;
+                for(int k=j%2; k<PLAYERS; k+=2) {
+                    if(Player[k].FLAG_picked == i+1) {
+                        Player[k].FLAG_picked=0;
+                        Player[k].FLAG_X=Player[i].X_POS; Player[k].FLAG_Y=Player[i].Y_POS;
+                        Player[i].X_POS=Player[i].init_X; Player[i].Y_POS=Player[i].init_Y;
+                    }
+                }
+                for(int k=(j+1)%2; k<PLAYERS; k+=2) {
+                    if(Player[k].FLAG_picked == i+1) {
+                        Player[k].FLAG_picked=0;
+                        Player[i].X_POS=Player[i].init_X; Player[i].Y_POS=Player[i].init_Y;
+                    }
+                }
 			}
 		}
 	}
 	for(int i=0; i<PLAYERS; i++) {
+        for(int j=0; j<PLAYERS; j++) {
+            if(Player[i].FLAG_X==Player[j].X_POS && Player[i].FLAG_Y==Player[j].Y_POS) {
+				Player[i].FLAG_picked=j+1;
+			}
+        }
+	}
+	for(int i=0; i<PLAYERS; i++) { //player
         //CHECK FOR PICKING UP POWERUP
 		if(PICKUP_X==Player[i].X_POS && PICKUP_Y==Player[i].Y_POS) {
 			Player[i].BOMB_no+=2;
@@ -724,16 +732,18 @@ int GAME::capture_collision_check() {
 		}
 		//CHECK IF PLAYER'S FLAG IS PICKED UP
 		if(Player[i].FLAG_picked) {
-			int j=Player[i].FLAG_picked-1;
+			int j=Player[i].FLAG_picked-1; //gun with player's flag
 			Player[i].FLAG_X=Player[j].X_POS;
 			Player[i].FLAG_Y=Player[j].Y_POS;
-			if(Player[j].X_POS==Player[j].init_X && Player[j].Y_POS==Player[j].init_Y) {
-				Player[j].POINTS+=10;
+			if(Player[j].X_POS==Player[j].init_X && Player[j].Y_POS==Player[j].init_Y && (j%2) != (i%2)) { //not same team
+                Player[j].POINTS+=10;
                 if(music)
                     Mix_PlayChannel(-1, pointChunk, 0);
-				Player[i].FLAG_X=Player[i].init_X;
-				Player[i].FLAG_Y=Player[i].init_Y;
-				Player[i].FLAG_picked=0;
+                Player[i].FLAG_X=Player[i].init_X;
+                Player[i].FLAG_Y=Player[i].init_Y;
+                Player[i].FLAG_picked=0;
+			} else if(Player[i].FLAG_X==Player[i].init_X && Player[i].FLAG_Y==Player[i].init_Y && (j%2) == (i%2)) { //same team
+                Player[i].FLAG_picked=0;
 			}
 		}
 	}
